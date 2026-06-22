@@ -1,0 +1,40 @@
+1. Check that the room can be booked with valid data
+
+Steps
+1. Go to https://automationintesting.online/
+2. Click on Rooms button on the NavBar
+3. Choose any room and press Book now
+4. Choose any dates from today by holding and dragging on the calendar 
+5. Press Reserve Now 
+6. Fill the fields with valid information
+7. Press Reserve Now 
+
+Expected result
+Booking Confirmed text is displayed. Correct date range is shown.
+
+2. Check that the room can’t be booked with invalid data
+
+Steps
+1. Go to https://automationintesting.online/
+2. Click on Rooms button on the NavBar
+3. Choose any room and press Book now
+4. Choose any dates from today by holding and dragging on the calendar 
+5. Press Reserve Now 
+6. Fill the email fields with invalid data (e.g. One letter name, letters in phone number field)
+7. Press Reserve Now
+
+Expected result
+Error message displayed under the info fields. Booking is not confirmed.
+
+3. Check that the earlier booked dates show as Unavailable
+Steps
+1. Go to https://automationintesting.online/
+2. Click on Rooms button on the NavBar
+3. Choose any room and book it for valid dates
+4. Go to Main page
+5. Choose Check In Date one day behind the booked room period
+6. Choose Check In Date one day after the booked room period
+7. Press Check Availability
+
+Expected result
+Booked room is not shown as room available to book.
