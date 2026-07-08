@@ -8,13 +8,9 @@ export class RoomPage {
 
   async choose_dates() {
     const date = Math.floor(Math.random() * 22) + 1;
-    const first_date = this.page
-      .locator(".rbc-button-link")
-      .filter({ hasText: `${date}` })
-      .first();
+    const first_date = this.page.getByRole("cell", { name: `${date}` }).first();
     const second_date = this.page
-      .locator(".rbc-button-link")
-      .filter({ hasText: `${date + 2}` })
+      .getByRole("cell", { name: `${date + 2}` })
       .first();
 
     const firstBox = await first_date.boundingBox();

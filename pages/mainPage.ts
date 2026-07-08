@@ -1,9 +1,11 @@
-import { expect, Locator, Page } from "@playwright/test";
+import { expect, Locator, Page, APIRequestContext } from "@playwright/test";
 
 export class MainPage {
   readonly page: Page;
+  readonly baseURL: string;
   constructor(page: Page) {
     this.page = page;
+    this.baseURL = "https://automationintesting.online";
   }
 
   async go_to_room_page(name: string) {
@@ -25,5 +27,34 @@ export class MainPage {
       name: "Check Availability",
     });
     await Filter_button.click();
+  }
+
+  async login_return_API_token(request: APIRequestContext): Promise<string> {
+    const loginResponse = await request.post(`${this.baseURL}/api/auth/login`, {
+      data: {
+        username: "admin",
+        password: "password",
+      },
+    });
+
+    expect(loginResponse.status()).toBe(200);
+    const loginBody = await loginResponse.json();
+    const token = loginBody.token;
+    const authToken = `token=${token}`;
+
+    const validateResponse = await request.post(
+      `${this.baseURL}/api/auth/validate`,
+      {
+        headers: {
+          Cookie: authToken,
+        },
+        data: {
+          token,
+        },
+      },
+    );
+
+    expect(validateResponse.status()).toBe(200);
+    return `token=${token}`;
   }
 }

@@ -1,28 +1,14 @@
 import { test, expect } from "@playwright/test";
 import { request } from "node:http";
 import { json } from "node:stream/consumers";
+import { MainPage } from "../pages/mainPage";
 
 const baseURL = "https://automationintesting.online";
 
-test("Create room using API", async ({ request }) => {
-  const loginResponse = await request.post(`${baseURL}/api/auth/login`, {
-    data: {
-      username: "admin",
-      password: "password",
-    },
-  });
-  expect(loginResponse.status()).toBe(200);
-  const loginBody = await loginResponse.json();
-  const token = loginBody.token;
-  const AuthToken = `token=${token}`;
-  const validate = await request.post(`${baseURL}/api/auth/validate`, {
-    headers: {
-      Cookie: AuthToken,
-    },
-    data: {
-      token: token,
-    },
-  });
+test("Create room using API", async ({ request, page }) => {
+  const mainMenuPage = new MainPage(page);
+  let AuthToken: string;
+  AuthToken = await mainMenuPage.login_return_API_token(request);
   const response = await request.post(`${baseURL}/api/room`, {
     headers: {
       Cookie: AuthToken,
@@ -44,7 +30,7 @@ test("Create room using API", async ({ request }) => {
   await expect(bodyString).toContain("180");
 });
 
-test("Book the room usign API and check it", async ({ request }) => {
+test("Book the room usign API and check it", async ({ request, page }) => {
   const uniqueMs = Date.now();
   const daysOffset = uniqueMs % 10000; // унікальний офсет
   const checkinDate = new Date();
@@ -55,15 +41,10 @@ test("Book the room usign API and check it", async ({ request }) => {
   const strCheckin = checkinDate.toISOString().split("T")[0];
   const strCheckout = checkoutDate.toISOString().split("T")[0];
 
-  const loginResponse = await request.post(`${baseURL}/api/auth/login`, {
-    data: { username: "admin", password: "password" },
-  });
-  expect(loginResponse.status()).toBe(200);
-  const loginBody = await loginResponse.json();
-  const token = loginBody.token;
-  const AuthToken = `token=${token}`;
+  const mainMenuPage = new MainPage(page);
+  let AuthToken: string;
+  AuthToken = await mainMenuPage.login_return_API_token(request);
 
-  // Спробуй також тут замість roomid: 1 використовувати динамічний ID, якщо система це дозволяє
   const bookRoom = await request.post(`${baseURL}/api/booking`, {
     headers: { Cookie: AuthToken },
     data: {
@@ -88,25 +69,10 @@ test("Book the room usign API and check it", async ({ request }) => {
   );
 });
 
-test("Edit room using API and check", async ({ request }) => {
-  const loginResponse = await request.post(`${baseURL}/api/auth/login`, {
-    data: {
-      username: "admin",
-      password: "password",
-    },
-  });
-  expect(loginResponse.status()).toBe(200);
-  const loginBody = await loginResponse.json();
-  const token = loginBody.token;
-  const AuthToken = `token=${token}`;
-  const validate = await request.post(`${baseURL}/api/auth/validate`, {
-    headers: {
-      Cookie: AuthToken,
-    },
-    data: {
-      token: token,
-    },
-  });
+test("Edit room using API and check", async ({ request, page }) => {
+  const mainMenuPage = new MainPage(page);
+  let AuthToken: string;
+  AuthToken = await mainMenuPage.login_return_API_token(request);
   const response = await request.get(`${baseURL}/api/room`);
   await expect(response.status()).toBe(200);
 
@@ -146,26 +112,11 @@ test("Edit room using API and check", async ({ request }) => {
   }
 });
 
-test("delete the room using API", async ({ request }) => {
-  const loginResponse = await request.post(`${baseURL}/api/auth/login`, {
-    data: {
-      username: "admin",
-      password: "password",
-    },
-  });
-  expect(loginResponse.status()).toBe(200);
-  const loginBody = await loginResponse.json();
-  const token = loginBody.token;
-  const AuthToken = `token=${token}`;
+test("delete the room using API", async ({ request, page }) => {
+  const mainMenuPage = new MainPage(page);
+  let AuthToken: string;
+  AuthToken = await mainMenuPage.login_return_API_token(request);
   const roomNumber = Date.now() % 1000000;
-  const validate = await request.post(`${baseURL}/api/auth/validate`, {
-    headers: {
-      Cookie: AuthToken,
-    },
-    data: {
-      token: token,
-    },
-  });
   const response = await request.post(`${baseURL}/api/room`, {
     headers: {
       Cookie: AuthToken,
